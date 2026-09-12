@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e0e0d">
+<meta name="color-scheme" content="dark">
+<title>Frontier Poker</title>
+<link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-icon" href="assets/icon-180.png">
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<section id="screen-career" class="screen">
+  <header class="career-head">
+    <h1 class="brand"><img src="assets/logo.png" alt="Frontier Poker" width="1200" height="459"></h1>
+    <p class="tagline">Face five legends of the Old West. Each plays true to their reputation, with a distinct style and their own way of taking your money.</p>
+    <div class="purse">
+      <span class="purse-label">Bankroll</span>
+      <span id="bankroll" class="purse-value">$0</span>
+    </div>
+    <button id="btnAchievements" class="purse purse-button">
+      <span class="purse-label">Achievements</span>
+      <span id="achieveCount" class="purse-value">0/10</span>
+    </button>
+  </header>
+
+  <div id="cityList" class="city-list"></div>
+
+  <div id="stakeRow" class="stake" hidden>
+    <p>You can't cover a buy-in anywhere. A stranger at the bar offers you fifty dollars to watch you play at Deadwood.</p>
+    <button id="btnStake" class="btn btn-quiet">Take The Offer</button>
+  </div>
+
+  <div class="career-links">
+    <button id="btnCareerStats" class="menu-item">Statistics</button>
+    <button id="btnCareerOpponents" class="menu-item">Opponents</button>
+    <button id="btnCareerGuide" class="menu-item">Guide</button>
+  </div>
+
+  <div class="career-links career-links-wide">
+    <button id="btnSettings" class="menu-item menu-quiet">Settings</button>
+  </div>
+
+  <footer class="career-foot">
+    <p class="version">Frontier Poker &middot; Version 1.0</p>
+    <p class="copyright"><span id="secretSpot">Ivaylo Krastev</span> &copy; 2026. All rights reserved.</p>
+  </footer>
+</section>
+<section id="screen-table" class="screen" hidden>
+  <header class="table-head">
+    <div class="tools">
+      <button id="btnMenu" class="icon-btn" aria-label="Menu" aria-haspopup="dialog">
+        <span class="ic ic-home"></span>
+      </button>
+      <button id="btnHelp" class="icon-btn" aria-label="Help" aria-haspopup="dialog">
+        <span class="ic ic-spade"></span>
+      </button>
+      <button id="btnOdds" class="icon-btn" aria-label="Odds" aria-haspopup="dialog">
+        <span class="ic ic-horseshoe"></span>
+      </button>
+    </div>
+    <span id="venue" class="venue"></span>
+    <span id="blindMeta" class="meta"></span>
+  </header>
+  <div class="table-sub"><span id="streetMeta" class="street"></span></div>
+
+  <div id="seats" class="seats"></div>
+
+  <div class="middle">
+    <div id="board" class="board"></div>
+    <div class="pot">
+      <span class="pot-label">Pot</span>
+      <span id="pot" class="pot-value">0</span>
+    </div>
+    <div id="banner" class="banner" hidden></div>
+  </div>
+
+  <div class="me" id="meBox">
+    <span id="myBadge" class="me-badge"></span>
+    <div id="hole" class="hole"></div>
+    <div class="me-info">
+      <span class="me-name">You</span>
+      <span id="myPos" class="me-pos"></span>
+      <span id="myChips" class="me-chips">0</span>
+      <span id="myHand" class="me-hand"></span>
+    </div>
+  </div>
+
+  <div id="controls" class="controls" hidden>
+    <div id="raiseRow" class="raise-row">
+      <div class="raise-head">
+        <span class="raise-label">Raise<span id="raiseCost" class="raise-cost"></span></span>
+        <span id="raiseAmount" class="raise-amount">0</span>
+      </div>
+      <div class="raise-track">
+        <button id="btnStepDown" class="step" aria-label="Decrease raise">&minus;</button>
+        <input id="raiseSlider" type="range" min="0" max="100" value="0" aria-label="Raise amount">
+        <button id="btnStepUp" class="step" aria-label="Increase raise">+</button>
+      </div>
+    </div>
+    <div class="action-row">
+      <button id="btnFold" class="btn btn-quiet">Fold</button>
+      <button id="btnCheck" class="btn btn-quiet">Check</button>
+      <button id="btnCall" class="btn btn-quiet">Call</button>
+      <button id="btnRaise" class="btn btn-strong">Raise</button>
+    </div>
+  </div>
+</section>
+<div id="modal" class="sheet" hidden>
+  <div class="sheet-panel" role="dialog" aria-modal="true">
+    <div class="sheet-head">
+      <h2 id="modalTitle">Menu</h2>
+      <button id="btnModalClose" class="icon-btn" aria-label="Close">
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M18.3 5.7 12 12l6.3 6.3-1.4 1.4L10.6 13.4 4.3 19.7 2.9 18.3 9.2 12 2.9 5.7l1.4-1.4L10.6 10.6l6.3-6.3Z"/></svg>
+      </button>
+    </div>
+    <div id="modalBody" class="sheet-body"></div>
+  </div>
+</div>
+<div id="showdown" class="sheet" hidden>
+  <div class="confirm-panel showdown-panel" role="dialog" aria-modal="true">
+    <p id="showdownLine" class="showdown-line"></p>
+    <div id="showdownCards" class="showdown-cards"></div>
+    <button id="showdownGo" class="btn btn-strong">Continue</button>
+  </div>
+</div>
+
+<div id="treasure" class="treasure" hidden>
+  <div class="treasure-card">
+    <img src="assets/gold.png" alt="" class="treasure-gold">
+    <p class="treasure-title" id="treasureTitle">Buried Treasure Found</p>
+    <p class="treasure-sum" id="treasureSum"></p>
+  </div>
+</div>
+
+<div id="unlocked" class="toast" hidden>
+  <div class="toast-card">
+    <img src="assets/star.png" alt="" class="toast-star">
+    <div>
+      <p class="toast-title">Achievement Unlocked</p>
+      <p class="toast-name" id="unlockedName"></p>
+    </div>
+  </div>
+</div>
+
+<div id="confirm" class="sheet" hidden>
+  <div class="confirm-panel" role="dialog" aria-modal="true">
+    <h2 id="confirmTitle">Leave The Table?</h2>
+    <p id="confirmBody"></p>
+    <div class="confirm-actions">
+      <button id="confirmCancel" class="btn btn-quiet">Stay</button>
+      <button id="confirmOk" class="btn btn-danger">Leave</button>
+    </div>
+  </div>
+</div>
+<section id="screen-result" class="screen" hidden>
+  <div class="result">
+    <p class="result-city" id="resultCity"></p>
+    <p class="result-place" id="resultPlace"></p>
+    <p class="result-line" id="resultLine"></p>
+    <dl class="result-figures">
+      <div><dt>Prize</dt><dd id="resultPrize"></dd></div>
+      <div><dt>Bankroll</dt><dd id="resultBankroll"></dd></div>
+    </dl>
+    <button id="btnContinue" class="btn btn-strong">Back To The Trail</button>
+  </div>
+</section>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
