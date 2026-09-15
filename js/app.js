@@ -20,6 +20,7 @@ const BUNDLE = typeof window !== 'undefined' ? window.__BUNDLE__ : null;
 const cardSrc = (code) => BUNDLE ? BUNDLE.cards[code || 'back'] : `assets/cards/${code || 'back'}.svg`;
 const starSrc = () => (BUNDLE && BUNDLE.star) ? BUNDLE.star : 'assets/star.png';
 const avatarSrc = (key) => BUNDLE ? BUNDLE.avatars[key] : `assets/avatars/${key}.png`;
+const portraitSrc = (key) => (BUNDLE && BUNDLE.portraits) ? BUNDLE.portraits[key] : `assets/avatars/full/${key}.jpg`;
 
 let save = loadSave();
 if (!save.speed) save.speed = 'standard';
@@ -75,7 +76,7 @@ function renderCareer() {
 
     const head = el('div', 'city-head');
     const title = el('div', 'city-title');
-    title.append(el('h3', null, city.name));
+    title.append(el('h3', null, 'Play at ' + city.name));
     title.append(el('p', 'city-region', city.region));
     head.append(title);
     head.append(el('div', 'city-buyin', money(city.buyIn)));
@@ -312,26 +313,44 @@ function recordAction(isYou, street, type) {
 // Everything is judged from the hand that just finished, so nothing is awarded twice
 // and nothing needs replaying to be noticed.
 function checkAchievements(t, won, wasAllIn) {
+  const st = save.stats;
   const earn = (id) => {
-    if (save.achievements[id]) return;
+    if (save.achievements[id]) return;      // never twice
     save.achievements[id] = Date.now();
     pendingAchievements.push(id);
   };
 
-  if (won) {
-    earn('first_blood');
-    if (wasAllIn) earn('last_stand');
-    if (won.amount >= 1000) earn('high_roller');
-    if (save.stats.streak >= 5) earn('cold_blooded');
+  // Counting milestones, judged from counters already updated for this hand.
+  if (st.handsWon >= 1) earn('first_blood');
+  if (st.handsWon >= 10) earn('wanted');
+  if (st.handsWon >= 50) earn('most_wanted');
+  if (st.hands >= 100) earn('long_trail');
+  if (st.showdownsWon >= 25) earn('sundown');
+  if (st.biggestPot >= 1000) earn('high_roller');
+  if (st.bestStreak >= 5) earn('cold_blooded');
+  if (st.earnings >= 10000) earn('gold_rush');
 
+  if (won) {
+    if (wasAllIn) earn('last_stand');
+    // Won before a single community card was dealt.
+    if (t.board.length === 0) earn('quick_draw');
+
+    // Hand categories come from the same evaluator the game scores with, and only
+    // count at a showdown, where the hand was actually shown down and beaten.
     if (t.results?.showdown) {
       if (t.inHand().length === 2) earn('high_noon');
       const me = t.players[0];
-      const five = bestFive([...me.hole, ...t.board]);
-      const name = handName(evaluate7([...me.hole, ...t.board]));
+      const cards = [...me.hole, ...t.board];
+      const five = bestFive(cards);
+      const name = handName(evaluate7(cards));
+      if (name === 'Three of a Kind') earn('three_guns');
+      if (name === 'Straight') earn('straight_shooter');
+      if (name === 'Flush') earn('red_river');
       if (name === 'Full House') earn('river_boat');
       if (name === 'Four of a Kind') earn('four_horsemen');
       if (name === 'Straight Flush' && Math.min(...five.map(cardRank)) === 10) earn('royal_flush');
+      // Pocket aces means the two cards you were dealt, not a pair made with the board.
+      if (me.hole.length === 2 && me.hole.every(c => cardRank(c) === 14)) earn('ace_in_the_hole');
       const codes = new Set(five.map(cardCode));
       if (['AS', 'AC', '8S', '8C'].every(c => codes.has(c))) earn('dead_mans_hand');
     }
@@ -528,12 +547,14 @@ async function runTournament() {
     }
     save.stats.streak = won ? save.stats.streak + 1 : 0;
     if (save.stats.streak > save.stats.bestStreak) save.stats.bestStreak = save.stats.streak;
-    checkAchievements(t, won, wasAllIn);
     if (won) {
       save.stats.handsWon++;
       if (won.amount > save.stats.biggestPot) save.stats.biggestPot = won.amount;
       if (t.results.showdown) save.stats.showdownsWon++;
     }
+    // Every counter is up to date before anything is judged, so a milestone unlocks
+    // on the hand that reaches it rather than the one after.
+    checkAchievements(t, won, wasAllIn);
 
     await revealHand();
     await flushAchievements();
@@ -631,17 +652,12 @@ function finishTournament() {
   const prize = T.prizeFor(place);
   save.bankroll += prize;
   if (place === 1) save.stats.won++;
-  if (place === 1) {
-    const prev = save.best[T.city.id];
-    if (!prev || place < prev) save.best[T.city.id] = place;
-    if (CITIES.every(c => save.best[c.id] === 1) && !save.achievements.legend) {
-      save.achievements.legend = Date.now();
-      pendingAchievements.push('legend');
-    }
-  }
   if (prize > 0) { save.stats.cashed++; save.stats.earnings += prize; }
   const prev = save.best[T.city.id];
   if (!prev || place < prev) save.best[T.city.id] = place;
+  // Prize money and the town record are final now, so Gold Rush and Legend are
+  // judged here rather than mid-hand.
+  checkAchievements(T.table, null, false);
   writeSave(save);   // includes what the table learned about you this tournament
 
   $('#resultPlace').textContent = ordinal(place);
@@ -698,14 +714,28 @@ function openModal(view, opts = {}) {
   $('#modal').hidden = false;
   const panel = $('.sheet-panel');
   panel.scrollTop = 0;
+  markScrollable(panel);
   // Fonts and the 169-cell grid can settle a frame later and drag the scroll with
   // them, so pin it again once layout has run.
   const afterLayout = window.requestAnimationFrame || ((fn) => setTimeout(fn, 0));
   afterLayout(() => { panel.scrollTop = 0; });
 }
 
+// A soft fade at the foot of the panel, shown only while there is more below.
+function markScrollable(panel) {
+  const update = () => {
+    const more = panel.scrollHeight - panel.clientHeight - panel.scrollTop > 8;
+    $('#modal').classList.toggle('has-more', more);
+  };
+  panel.onscroll = update;
+  update();
+  const later = window.requestAnimationFrame || ((fn) => setTimeout(fn, 0));
+  later(update);
+}
+
 function closeModal() {
   $('#modal').hidden = true;
+  $('#modal').classList.remove('has-more');
   modalView = null;
   modalStack = [];
 }
@@ -938,7 +968,7 @@ function buildStats(body) {
     ['Finished In The Money', String(st.cashed)],
     ['Prize Money', money(st.earnings)],
     ['Paid In Buy-Ins', money(st.buyIns)],
-    ['Net', (st.earnings - st.buyIns >= 0 ? '+' : '\u2212') + money(Math.abs(st.earnings - st.buyIns))],
+    ['Net', netLabel(st.earnings - st.buyIns)],
   ]));
 
   body.append(el('h3', 'odds-sub', 'Best Finish'));
@@ -1004,6 +1034,12 @@ function winningHands(book) {
   return list;
 }
 
+// Zero is just zero; only a real gain or loss takes a sign.
+function netLabel(n) {
+  if (n === 0) return money(0);
+  return (n > 0 ? '+' : '\u2212') + money(Math.abs(n));
+}
+
 function statTable(rows) {
   const list = el('dl', 'stats');
   for (const [label, value] of rows) {
@@ -1045,12 +1081,13 @@ function buildGameSettings(body) {
 }
 
 function buildMenu(body) {
+  navRow(body, 'Achievements', 'achievements');
   navRow(body, 'Statistics', 'stats');
   navRow(body, 'Opponents', 'opponents');
   navRow(body, 'Guide', 'rules');
   navRow(body, 'Settings', 'gameSettings');
   // Stepping away keeps the seat. The tournament is saved and waiting.
-  const leave = el('button', 'menu-item menu-gold', 'Leave Table');
+  const leave = el('button', 'menu-item menu-gold', 'Main Menu');
   leave.addEventListener('click', () => {
     if (T && !T.finished) { save.resume = snapshot(T, true); }
     writeSave(save);
@@ -1088,7 +1125,8 @@ function buildOpponents(body) {
     const row = el('div', 'opp');
     const img = el('img', 'opp-av');
     img.src = avatarSrc(prof.avatar);
-    img.alt = '';
+    img.alt = prof.name;
+    img.addEventListener('click', () => showPortrait(prof.avatar, prof.name));
     row.append(img);
     const txt = el('div', 'opp-text');
     const head = el('div', 'opp-head');
@@ -1102,6 +1140,8 @@ function buildOpponents(body) {
     row.append(txt);
     body.append(row);
   }
+  body.append(el('p', 'sheet-note foot-note is-centred',
+    'Playing styles are drawn from what each of these people was known for and shaped for the game. Portraits are original artistic interpretations.'));
   backRow(body);
 }
 
@@ -1318,6 +1358,14 @@ function secretTap(el, amount, title) {
 }
 secretTap($('#secretSpot'), 50, 'Buried Treasure Found');
 
+function showPortrait(key, name) {
+  $('#portraitImg').src = portraitSrc(key);
+  $('#portraitImg').alt = name;
+  $('#portraitName').textContent = name;
+  $('#portrait').hidden = false;
+}
+$('#portrait').addEventListener('click', () => { $('#portrait').hidden = true; });
+
 function showTreasure(amount, title) {
   const box = $('#treasure');
   $('#treasureTitle').textContent = title;
@@ -1369,5 +1417,14 @@ renderCareer();
 
 // Service workers need a secure context; the standalone file:// build simply skips it.
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-  window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+    // Without this the browser may clear the cache and the save when space runs
+    // short. Granted silently once the game is installed or used regularly.
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persisted()
+        .then((already) => (already ? true : navigator.storage.persist()))
+        .catch(() => {});
+    }
+  });
 }

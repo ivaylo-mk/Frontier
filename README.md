@@ -4,6 +4,8 @@
 
 A lightweight, browser-based Texas Hold'em career game set in the Old West. Play against five adaptive AI legends across four towns in an engine driven by real-time hand simulations, pot odds, and behavioral tracking—with zero accounts, ads, or network telemetry.
 
+**Play at:** **[https://frontier.ivaylokrastev.com](https://frontier.ivaylokrastev.com)**
+
 ---
 
 ## AI Opponents & Decision Engine
@@ -29,7 +31,7 @@ The core of Frontier Poker is its honest, non-cheating AI. Opponents cannot see 
 
 Start in **Deadwood** with a $200 bankroll and a $50 buy-in. Compete in 6-player single-table tournaments where 1st place earns 50% of the pool, with 2nd and 3rd splitting the rest. Build your bankroll to unlock higher-stake venues: **Dodge City**, **Tombstone**, and **Denver**.
 
-* **Achievements:** Earn 10 trackable career achievements as you progress through the towns.
+* **Achievements:** Earn 20 trackable career achievements as you progress through the towns.
 * **Autosave:** Game state, tournament progress, and opponent memories save continuously to local storage.
 
 ---

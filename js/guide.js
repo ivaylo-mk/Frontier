@@ -239,13 +239,23 @@ export const CORE_RANGE = ['22+', 'ATs+', 'KTs+', 'QTs+', 'JTs', 'AQo+', 'KQo'];
 
 export const ACHIEVEMENTS = [
   { id: 'first_blood', name: 'First Blood', how: 'Win your first hand.' },
+  { id: 'quick_draw', name: 'Quick Draw', how: 'Win a hand before the flop.' },
   { id: 'high_noon', name: 'High Noon', how: 'Win a heads-up showdown.' },
   { id: 'last_stand', name: 'Last Stand', how: 'Win a hand after going all-in.' },
   { id: 'cold_blooded', name: 'Cold-Blooded', how: 'Win five hands in a row.' },
   { id: 'high_roller', name: 'High Roller', how: 'Win a pot worth $1,000 or more.' },
+  { id: 'wanted', name: 'Wanted', how: 'Win 10 hands.' },
+  { id: 'most_wanted', name: 'Most Wanted', how: 'Win 50 hands.' },
+  { id: 'long_trail', name: 'The Long Trail', how: 'Play 100 hands.' },
+  { id: 'sundown', name: 'Showdown at Sundown', how: 'Win 25 showdowns.' },
+  { id: 'three_guns', name: 'Three Guns', how: 'Win with Three of a Kind.' },
+  { id: 'straight_shooter', name: 'Straight Shooter', how: 'Win with a Straight.' },
+  { id: 'red_river', name: 'Red River', how: 'Win with a Flush.' },
   { id: 'river_boat', name: 'River Boat', how: 'Win with a Full House.' },
   { id: 'four_horsemen', name: 'Four Horsemen', how: 'Win with Four of a Kind.' },
   { id: 'royal_flush', name: 'Frontier Royalty', how: 'Win with a Royal Flush.' },
+  { id: 'ace_in_the_hole', name: 'Ace in the Hole', how: 'Win a showdown with pocket aces.' },
   { id: 'dead_mans_hand', name: "Dead Man's Hand", how: 'Win with two black aces and two black eights.' },
+  { id: 'gold_rush', name: 'Gold Rush', how: 'Earn $10,000 in prize money.' },
   { id: 'legend', name: 'Legend of the Frontier', how: 'Win every tournament.' },
 ];

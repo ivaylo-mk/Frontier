@@ -194,7 +194,7 @@ input[type=range]:focus-visible { outline: 2px solid var(--amber); outline-offse
   display: flex; flex-direction: column; justify-content: center;
 }
 .board { display: flex; gap: 5px; justify-content: center; }
-.card { width: clamp(44px, min(15.5vw, 9.2vh), 62px); aspect-ratio: 250 / 350; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,.45)); }
+.card { width: clamp(40px, min(15.5vw, 8.4vh), 62px); aspect-ratio: 250 / 350; display: block; filter: drop-shadow(0 2px 4px rgba(0,0,0,.45)); }
 .card-slot { border: 1px dashed var(--line); border-radius: 7px; }
 
 .pot { text-align: center; margin-top: 11px; }
@@ -217,7 +217,7 @@ input[type=range]:focus-visible { outline: 2px solid var(--amber); outline-offse
   box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
 }
 .hole { display: flex; gap: 5px; }
-.hole .card { width: clamp(48px, min(16.5vw, 10vh), 68px); }
+.hole .card { width: clamp(44px, min(16.5vw, 9vh), 68px); }
 .me-info { text-align: right; }
 .me-name { display: block; font-size: 17px; font-weight: 600; }
 .me-chips { display: block; font-size: 17px; color: #a5a29a; margin-top: 3px; }
@@ -656,7 +656,7 @@ input[type=range]:disabled { opacity: .4; }
 
 /* ---------- short screens, and landscape on a phone ---------- */
 
-@media (max-height: 720px) {
+@media (max-height: 760px) {
   .screen { padding-top: 10px; }
   .seats { margin-bottom: 8px; }
   .middle { margin-bottom: 8px; }
@@ -672,6 +672,12 @@ input[type=range]:disabled { opacity: .4; }
   .pot-label { display: none; }
   .pot-value { font-size: 26px; }
   .me-hand { margin-top: 3px; }
+  .seat-cards { display: none; }
+  .me { min-height: 78px; }
+  .raise-row { margin-bottom: 7px; }
+  .raise-head { margin-bottom: 4px; }
+  .action-row .btn { padding: 10px 8px; }
+  .screen { padding-bottom: 14px; }
 }
 
 /* ---------- larger screens ---------- */
@@ -687,28 +693,25 @@ input[type=range]:disabled { opacity: .4; }
 
 /* ---------- scrollbars ---------- */
 
-html, body, * { scrollbar-width: thin; scrollbar-color: #45443f transparent; }
-
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
-::-webkit-scrollbar-track-piece { background: transparent; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background-color: #45443f;
-  border-radius: 999px;
-  border: 3px solid transparent;
-  background-clip: content-box;
-}
-::-webkit-scrollbar-thumb:hover { background-color: #5a5850; }
-::-webkit-scrollbar-corner { background: transparent; }
+/* The stepper arrows on a desktop scrollbar cannot be styled away reliably, so the
+   bar is hidden altogether. Wheel, touch, keyboard and trackpad scrolling all still
+   work; only the visible track is gone. */
+html, body, * { scrollbar-width: none; }
+::-webkit-scrollbar { width: 0; height: 0; display: none; }
 
 /* Keep the bar clear of the panel's rounded top so it does not cut the corner. */
-.sheet-panel {
-  scrollbar-gutter: stable;
-  overscroll-behavior: contain;
+.sheet-panel { overscroll-behavior: contain; }
+#modal { position: fixed; }
+.sheet-fade {
+  position: absolute; left: 50%; transform: translateX(-50%); bottom: 0;
+  width: 100%; max-width: 520px;   /* matches the panel, not the whole viewport */
+  height: 44px; pointer-events: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  background: linear-gradient(rgba(14,14,13,0), var(--bg));
+  opacity: 0; transition: opacity .2s ease;
 }
-.sheet-panel::-webkit-scrollbar-track { margin: 34px 0 16px; }
-.sheet-panel::-webkit-scrollbar-track-piece { margin: 34px 0 16px; }
+#modal.has-more .sheet-fade { opacity: 1; }
+
 
 
 #screen-table {
@@ -716,6 +719,9 @@ html, body, * { scrollbar-width: thin; scrollbar-color: #45443f transparent; }
   display: flex;
   flex-direction: column;
 }
+#screen-table .seats,
+#screen-table .me,
+#screen-table .controls { flex: 0 0 auto; }
 #screen-table[hidden] { display: none; }
 
 .career-foot { margin-top: 26px; text-align: center; }
@@ -901,3 +907,21 @@ html, body, * { scrollbar-width: thin; scrollbar-color: #45443f transparent; }
   from { opacity: 1; transform: none; }
   to { opacity: 0; transform: translateY(-12px); }
 }
+
+
+.opp-av { cursor: zoom-in; }
+
+.portrait {
+  position: fixed; inset: 0; z-index: 80;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; background: rgba(0,0,0,.82);
+}
+.portrait-card { max-width: 520px; width: 100%; text-align: center; }
+.portrait-card img {
+  display: block; width: 100%; height: auto; border-radius: 16px;
+  box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  animation: popIn .2s ease-out both;
+}
+.portrait-name { margin: 12px 0 0; font-size: 18px; font-weight: 600; color: var(--amber); }
+
+.is-centred { text-align: center; }

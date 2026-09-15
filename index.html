@@ -7,6 +7,16 @@
 <meta name="color-scheme" content="dark">
 <title>Frontier Poker</title>
 <link rel="icon" href="assets/icon-192.png">
+<link rel="apple-touch-startup-image" href="assets/splash-1024.png">
+<meta property="og:title" content="Frontier Poker">
+<meta property="og:description" content="Texas Hold'em against five legends of the old West. Each plays true to their reputation.">
+<meta property="og:url" content="https://frontier.ivaylokrastev.com/">
+<meta property="og:image" content="https://frontier.ivaylokrastev.com/assets/social.jpg">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Frontier Poker">
+<meta name="twitter:description" content="Texas Hold'em against five legends of the old West. Each plays true to their reputation.">
+<meta name="twitter:image" content="https://frontier.ivaylokrastev.com/assets/social.jpg">
 <link rel="apple-touch-icon" href="assets/icon-180.png">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/style.css">
@@ -44,7 +54,7 @@
   </div>
 
   <footer class="career-foot">
-    <p class="version">Frontier Poker &middot; Version 1.0</p>
+    <p class="version">Frontier Poker &middot; Version 1.1</p>
     <p class="copyright"><span id="secretSpot">Ivaylo Krastev</span> &copy; 2026. All rights reserved.</p>
   </footer>
 </section>
@@ -118,12 +128,20 @@
     </div>
     <div id="modalBody" class="sheet-body"></div>
   </div>
+  <div class="sheet-fade" aria-hidden="true"></div>
 </div>
 <div id="showdown" class="sheet" hidden>
   <div class="confirm-panel showdown-panel" role="dialog" aria-modal="true">
     <p id="showdownLine" class="showdown-line"></p>
     <div id="showdownCards" class="showdown-cards"></div>
     <button id="showdownGo" class="btn btn-strong">Continue</button>
+  </div>
+</div>
+
+<div id="portrait" class="portrait" hidden>
+  <div class="portrait-card">
+    <img id="portraitImg" src="" alt="">
+    <p id="portraitName" class="portrait-name"></p>
   </div>
 </div>
 
