@@ -2,7 +2,7 @@
   <img src="assets/logo.png" width="350" alt="Frontier Poker">
 </p>
 
-A lightweight, browser-based Texas Hold'em career game set in the Old West. Play against five adaptive AI legends across four towns in an engine driven by real-time hand simulations, pot odds, and behavioral tracking—with zero accounts, ads, or network telemetry.
+A lightweight, browser-based Texas Hold'em career game set in the Old West. Play against five adaptive AI legends across four towns in an engine driven by real-time hand simulations, pot odds, and behavioral tracking, with zero accounts, ads, or network telemetry.
 
 **Play at:** **[https://frontier.ivaylokrastev.com](https://frontier.ivaylokrastev.com)**
 
